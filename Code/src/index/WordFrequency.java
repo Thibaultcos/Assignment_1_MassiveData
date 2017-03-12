@@ -1,4 +1,4 @@
-package inverted_frequency;
+package index;
 
 import java.io.DataInput;
 import java.io.DataOutput;

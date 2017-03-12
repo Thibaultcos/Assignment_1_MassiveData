@@ -1,4 +1,4 @@
-package stopwords_10reducers;
+package stopwords;
 
 import java.io.IOException;
 import java.util.*;

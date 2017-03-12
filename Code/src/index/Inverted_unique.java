@@ -1,4 +1,4 @@
-package inverted_simple;
+package index;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,10 +18,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 
         
-public class Inverted_simple {
+public class Inverted_unique {
  
 	public static enum CUSTOM_COUNTER {
-		Counter_Words,
+		Counter_Unique_Words,
 	};
 
 	public static class Map extends Mapper<LongWritable, Text, Text, Text> {
@@ -35,28 +35,25 @@ public class Inverted_simple {
 			HashSet<String> stopwords = new HashSet<String>();
 
 			BufferedReader Reader = new BufferedReader(new FileReader(new File("/home/cloudera/workspace/stopwords.csv")));
-			String Stopline;
+			
+			String Stopline;		
 	    	while((Stopline = Reader.readLine()) !=null) {
 	    		String[] array = Stopline.split(",");
 	    		stopwords.add(array[0].toLowerCase());
 	    	}
 	 		
-			String filenameStr = ((FileSplit) context.getInputSplit())
-					.getPath().getName();
-			filename = new Text(filenameStr);
+			filename = new Text(((FileSplit) context.getInputSplit()).getPath().getName());
 			Reader.close();
-
+             			
 			String line = value.toString().toLowerCase().replaceAll("[\\p{Punct}&&[^']&&[^-]]|(?<![a-zA-Z])'|'(?![a-zA-Z])|--|(?<![a-zA-Z])-|-(?![a-zA-Z])|\\d+"," ");
-			for (String token : line.split("\\s+")) {
+			for (String token : line.split(" ")) {
 				if (!stopwords.contains(token.toLowerCase()) && !token.isEmpty() && token != null) {
 					word.set(token.toLowerCase());
-					context.write(word, filename);	
+					context.write(word, filename);
 				}
-			}					 
+			}								 
 		}
 	}
- 
- 
  
  
         
@@ -82,28 +79,36 @@ public class Inverted_simple {
 					stringBuilder.append(", "+value);
 				}				
 			}
-			if (!key.toString().isEmpty()) {		
-			context.write(key, new Text(stringBuilder.toString())); 
-			context.getCounter(CUSTOM_COUNTER.Counter_Words).increment(1);		
+			if (!key.toString().isEmpty()) {
+				if (files.size() == 1 ) {
+					context.getCounter(CUSTOM_COUNTER.Counter_Unique_Words).increment(1);
+				}
 			}
 		}
+	 protected void cleanup(Context context)
+             throws IOException, InterruptedException {
+			Long final_count = new Long(5);
+			final_count = context.getCounter(CUSTOM_COUNTER.Counter_Unique_Words).getValue();
+            context.write(new Text("Number of words in unique file: "), new Text(String.valueOf(final_count)));
+         }
 	}
         
  public static void main(String[] args) throws Exception {
     Configuration conf = new Configuration();
         
-        Job job = new Job(conf, "inverted_simple");
+        Job job = new Job(conf, "inverted_unique");
     
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(Text.class);
-    job.setJarByClass(Inverted_simple.class);
-        
+    job.setJarByClass(Inverted_unique.class);
+    job.setNumReduceTasks(1);    
+    
     job.setMapperClass(Map.class);
     job.setReducerClass(Reduce.class);
+
         
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    job.setNumReduceTasks(10);
     
     conf.setBoolean("mapreduce.map.output.compress",true);
     conf.set("mapred.map.output.compression.codec","org.apache.hadoop.io.compress.SnappyCodec");
@@ -114,5 +119,4 @@ public class Inverted_simple {
         
     job.waitForCompletion(true);
  }
-        
-}
+}       

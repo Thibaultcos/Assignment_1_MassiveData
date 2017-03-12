@@ -1,4 +1,5 @@
-package relative_stripes;
+package relative_frequency;
+
 
 import java.io.IOException;
 import java.util.*;
@@ -13,7 +14,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
         
-public class relative_stripes {
+public class Relative_stripes {
         
 	public static class Map extends Mapper<LongWritable, Text, Text, Text> {
 	    
@@ -106,7 +107,7 @@ public class relative_stripes {
     
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(Text.class);
-    job.setJarByClass(relative_stripes.class);
+    job.setJarByClass(Relative_stripes.class);
         
     job.setMapperClass(Map.class);
     job.setReducerClass(Reduce.class);

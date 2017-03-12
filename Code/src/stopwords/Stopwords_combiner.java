@@ -1,4 +1,4 @@
-package stopwords_compression;
+package stopwords;
 
 import java.io.IOException;
 import java.util.*;
@@ -13,7 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
         
-public class Stopwords_compression {
+public class Stopwords_combiner {
         
  public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
@@ -58,24 +58,22 @@ public class Stopwords_compression {
  public static void main(String[] args) throws Exception {
 	 Configuration conf = new Configuration();
      
-     Job job = new Job(conf, "Stopwords_compression");
+     Job job = new Job(conf, "Stopwords_10reducers");
     
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
-    job.setJarByClass(Stopwords_compression.class);
+    job.setJarByClass(Stopwords_combiner.class);
         
     job.setMapperClass(Map.class);
     job.setReducerClass(Reduce.class);
     job.setCombinerClass(Combine.class);
-    job.setNumReduceTasks(10);
+    job.setNumReduceTasks(1);
         
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
     
     job.getConfiguration().set("mapreduce.output.textoutputformat.separator", ",");
-    
-    conf.setBoolean("mapreduce.map.output.compress",true);
-    conf.set("mapred.map.output.compression.codec","org.apache.hadoop.io.compress.SnappyCodec");
+	
         
     FileInputFormat.addInputPath(job, new Path(args[0]));
     FileOutputFormat.setOutputPath(job, new Path(args[1]));
@@ -84,4 +82,3 @@ public class Stopwords_compression {
  }
         
 }
-

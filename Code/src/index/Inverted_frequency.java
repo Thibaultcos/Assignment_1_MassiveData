@@ -1,5 +1,4 @@
-package inverted_frequency;
-
+package index;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,9 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.HashMap;      
-
-
-
 
 import java.util.Set;
 
@@ -22,8 +18,6 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-
-
 
         
 public class Inverted_frequency {
@@ -48,8 +42,7 @@ public class Inverted_frequency {
 	    		String[] array = Stopline.split(",");
 	    		stopwords.add(array[1].toLowerCase());
 	    	}		
-			String filename = ((FileSplit) context.getInputSplit())
-					.getPath().getName();
+			String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
 			Reader.close();
             
 			String line = value.toString().toLowerCase().replaceAll("[\\p{Punct}&&[^']&&[^-]]|(?<![a-zA-Z])'|'(?![a-zA-Z])|--|(?<![a-zA-Z])-|-(?![a-zA-Z])|\\d+"," ");
@@ -68,7 +61,6 @@ public class Inverted_frequency {
 	public static class Combine extends
 	Reducer<Text, WordFrequency, Text, WordFrequency> {
 		
-
 
 		public void reduce(Text key, Iterable<WordFrequency> values,
 		Context context) throws IOException, InterruptedException {
@@ -89,7 +81,6 @@ public class Inverted_frequency {
 			WordFrequency newmap = new WordFrequency();
 			for (String filename : map.keySet()) {
 				newmap.set(filename, map.get(filename).get()); 
-				//file = filename + " " + map.get(filename).get();	
 				}
 			context.write(key, newmap);
 		}
@@ -149,7 +140,3 @@ public class Inverted_frequency {
 	        
 	 }
 		
-
-
- 
-        

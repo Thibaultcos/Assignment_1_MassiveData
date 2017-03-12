@@ -1,4 +1,4 @@
-package relative_pairs;
+package relative_frequency;
 
 import java.util.*;
 import java.io.BufferedReader;
@@ -24,10 +24,6 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-
-import relative_stripes.relative_stripes;
-
-
 
 
 
